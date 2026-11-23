@@ -82,6 +82,8 @@ circle(438, 292, 16, C.redGlow); circle(438, 292, 7, C.white);
 line(408, 252, 470, 272, 6, C.black);
 // Grin: flat on the good side, smirking up on the rogue side
 line(356, 344, 398, 344, 4, C.black); line(398, 344, 452, 330, 4, C.black);
+// Neck connecting head to torso (without it the head floats)
+rect(372, 384, 56, 48, C.robotDark); rect(382, 384, 36, 48, C.robot);
 
 // --- Desk ---
 rect(0, 592, W, 208, C.desk); rect(0, 592, W, 26, C.deskTop);
@@ -96,13 +98,15 @@ for (const [x1, y1, x2, y2] of [[548, 500, 524, 476], [700, 500, 726, 476], [625
   line(x1, y1, x2, y2, 3, C.yellow);
 
 // --- Papers flying (the paperwork of a whole company being rewritten) ---
-function paper(x: number, y: number, dx: number, dy: number) {
-  // a slightly skewed sheet: draw as offset stacked rects
-  for (let i = 0; i < 44; i++) {
-    const off = Math.round((i / 44) * dx);
-    rect(x + off, y + Math.round((i / 44) * dy), 58, 2, C.paper);
+function paper(x: number, y: number, dx: number, _dy: number) {
+  // A proper 58x44 sheet: one row per pixel of height, each row shifted
+  // by the tilt (dx spread over the sheet's height). Text lines sit at
+  // fixed rows and use that row's shift, so they stay inside the sheet.
+  for (let r = 0; r < 44; r++) {
+    const off = Math.round((r / 44) * dx);
+    rect(x + off, y + r, 58, 1, C.paper);
+    if (r === 11 || r === 21 || r === 31) rect(x + off + 8, y + r, 36, 2, C.ink);
   }
-  for (let r = 0; r < 3; r++) line(x + 8, y + 10 + r * 11, x + 44, y + 10 + r * 11 + dy, 1, C.ink);
 }
 paper(96, 196, 18, 10); paper(620, 150, -20, 12); paper(150, 96, 12, -6);
 paper(560, 250, 22, 6); paper(84, 300, -14, 8);
